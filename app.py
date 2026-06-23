@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request, session
 from flasgger import Swagger
 from productos import producto
+import sqlite3
 
-app = Flask (__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
+
 app.secret_key = "123"
 
 app.config['SWAGGER'] = {
@@ -12,56 +14,81 @@ swagger = Swagger (app, template_file='disquitos.yaml')
 
 @app.route('/')
 def inicio():
-    return ("Bienvenido a disquitos")
+    return app.send_static_file('index.html')
+
+def conectar_db():
+    conexion = sqlite3.connect('disquitos.db')
+    conexion.row_factory = sqlite3.Row
+    return conexion
 
 @app.route('/productos')
 def get_productos():
-    return jsonify({"Discos Disponibles": producto}) 
+    conexion = conectar_db()
+    cursor = conexion.cursor()
+    cursor.execute('SELECT nombre, precio FROM productos')
+    filas = cursor.fetchall()
+    conexion.close()
+    
+    lista_productos = [{"nombre": f["nombre"], "precio": f["precio"]} for f in filas]
+    return jsonify({"Discos Disponibles": lista_productos})
 
 @app.route('/productos/<string:nombre>')
 def get_producto(nombre):
-    producto_encontrado = [p for p in producto if p ['nombre']  == nombre]
-    if (len(producto_encontrado)>0):
-        return jsonify({"disco": producto_encontrado[0]})
+    conexion = conectar_db()
+    cursor = conexion.cursor()
+    cursor.execute('SELECT nombre, precio FROM productos WHERE LOWER(nombre) = LOWER(?)', (nombre,))
+    fila = cursor.fetchone()
+    conexion.close()
+    
+    if fila:
+        return jsonify({"disco": {"nombre": fila["nombre"], "precio": fila["precio"]}})
     else:
-        return ("Producto no encontrado"),404
+        return "Producto no encontrado", 404
 
-@app.route('/carrito', methods=['GET', 'POST'])
+
+@app.route('/carrito', methods=['GET'])
+def ver_carrito():
+    if 'carrito' not in session:
+        session['carrito'] = []
+    return str(session['carrito'])
+
+@app.route('/carrito/agregar', methods=['POST'])
 def agregar_carrito():
-    if 'carrito'not in session:
-        session['carrito']= []
-
-    if request.method == 'GET':
-        return jsonify({"Carrito": session['carrito']})
-
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        nombre = data.get('nombre')
-        cantidad= data.get('cantidad', 1)
-
-        if not nombre:
-            return ("Falta el nombre del producto"),400
-            
-        producto_encontrado= next((p for p in producto if p ['nombre']== nombre), None)
-        if not producto_encontrado:
-            return ("Producto no encontrado"),404
-
-
-        carrito= session ['carrito'] 
-        produ_encontrado = next(( p for p in carrito if p ['nombre']== nombre), None)
-
-        if produ_encontrado:
-            produ_encontrado['cantidad'] += cantidad
-        else:
-            carrito.append({
-                "nombre": producto_encontrado['nombre'],
-                "precio": producto_encontrado['precio'],
-                "cantidad": cantidad }) 
+    if 'carrito' not in session:
+        session['carrito'] = []
         
-        session.modified = True
-
-        return jsonify({"Producto agregado": nombre, "carrito": carrito})
-
+    data = request.get_json(force=True)
+    nombre = data.get('nombre')
+    cantidad = data.get('cantidad', 1)
+    
+    if not nombre:
+        return "Falta el nombre del producto", 400
+        
+    conexion = conectar_db()
+    cursor = conexion.cursor()
+    cursor.execute('SELECT nombre, precio FROM productos WHERE LOWER(nombre) = LOWER(?)', (nombre,))
+    fila = cursor.fetchone()
+    conexion.close()
+    
+    if not fila:
+        return "Producto no encontrado", 404
+        
+    carrito = session['carrito']
+    produ_encontrado = next((p for p in carrito if p['nombre'].lower() == nombre.lower()), None)
+    
+    if produ_encontrado:
+        produ_encontrado['cantidad'] += cantidad
+    else:
+        carrito.append({
+            "nombre": fila['nombre'],
+            "precio": fila['precio'],
+            "cantidad": cantidad
+        })
+        
+    session['carrito'] = carrito
+    session.modified = True
+    return f"Producto {nombre} agregado correctamente al carrito"
+    
 @app.route('/carrito/<string:nombre>', methods=['DELETE'])
 def eliminar_carrito(nombre):
 
@@ -85,6 +112,11 @@ def total_carrito():
     total = sum(p['precio'] * p['cantidad'] for p in carrito)
 
     return jsonify({"Total de Compra": total})
+
+@app.route('/limpiar', methods=['POST'])
+def limpiar_sesion():
+    session.clear()  
+    return ( "Reinicio de sesion"), 200
 
 
 if __name__ == '__main__':
