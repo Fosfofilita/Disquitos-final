@@ -43,14 +43,14 @@ def get_producto(nombre):
     if fila:
         return jsonify({"disco": {"nombre": fila["nombre"], "precio": fila["precio"]}})
     else:
-        return "Producto no encontrado", 404
+        return jsonify("Producto no encontrado"), 404
 
 
 @app.route('/carrito', methods=['GET'])
 def ver_carrito():
     if 'carrito' not in session:
         session['carrito'] = []
-    return str(session['carrito'])
+    return jsonify(session['carrito'])
 
 @app.route('/carrito/agregar', methods=['POST'])
 def agregar_carrito():
@@ -62,7 +62,7 @@ def agregar_carrito():
     cantidad = data.get('cantidad', 1)
     
     if not nombre:
-        return "Falta el nombre del producto", 400
+        return jsonify("Falta el nombre del producto"), 400
         
     conexion = conectar_db()
     cursor = conexion.cursor()
@@ -71,7 +71,7 @@ def agregar_carrito():
     conexion.close()
     
     if not fila:
-        return "Producto no encontrado", 404
+        return jsonify("Producto no encontrado"), 404
         
     carrito = session['carrito']
     produ_encontrado = next((p for p in carrito if p['nombre'].lower() == nombre.lower()), None)
@@ -87,19 +87,19 @@ def agregar_carrito():
         
     session['carrito'] = carrito
     session.modified = True
-    return f"Producto {nombre} agregado correctamente al carrito"
+    return jsonify(f"Producto {nombre} agregado correctamente al carrito"),200
     
 @app.route('/carrito/<string:nombre>', methods=['DELETE'])
 def eliminar_carrito(nombre):
 
-    if 'carrito' not in session:
-        return "Carrito vacio"
-    
+    if 'carrito' not in session or len(session['carrito']) == 0:
+        return jsonify("Carrito vacio"), 404
+
     carrito= session ['carrito'] 
     producto_encontrado = next((p for p in carrito if p['nombre'] == nombre), None)
     
     if not producto_encontrado:
-        return ("Producto no encontrado en el carrito"),404
+        return jsonify("Producto no encontrado en el carrito"), 404
     
     carrito.remove(producto_encontrado)
     session.modified = True
@@ -116,7 +116,7 @@ def total_carrito():
 @app.route('/limpiar', methods=['POST'])
 def limpiar_sesion():
     session.clear()  
-    return ( "Reinicio de sesion"), 200
+    return jsonify("Reinicio de sesion"), 200
 
 
 if __name__ == '__main__':

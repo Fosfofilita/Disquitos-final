@@ -1,3 +1,7 @@
 Flask
 flasgger
 gunicorn
+
+# pip install -r requirements.txt instala lo necesario para correr el poyecto
+# render detecta el arhivo y hace la instalacion automatica 
+# gunicorn es el intermediario entre el servidor y el codigo python
