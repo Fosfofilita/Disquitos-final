@@ -1,118 +1,174 @@
 openapi: 3.0.3
 info:
-  title: Disquitos Api
-  description: Api que gestiona un catálogo de discos y un carrito de compras. Permite consultar productos, agregar items al carrito, eliminarlos y calcular el total de la compra.
+  title: Disquitos API
+  description: >
+    API que gestiona un catálogo de discos y un carrito de compras.
+    Permite consultar productos, agregar items al carrito, eliminarlos
+    y calcular el total de la compra.
   version: 1.0.0
-  contact: {}
 servers:
-- url: http://127.0.0.1:5000
+  - url: http://127.0.0.1:5000
+
 paths:
   /:
     get:
       summary: Inicio
-      description: Muestra mensaje de bienvenida
+      description: Sirve el frontend de la tienda
       operationId: inicio
       responses:
         '200':
-          description: ''
-      security:
-      - {}
+          description: Página HTML de la tienda
+
   /productos:
     get:
-      summary: Productos
-      description: Muestra todos los discos disponibles
-      operationId: productos
+      summary: Listar productos
+      description: Devuelve todos los discos disponibles en el catálogo
+      operationId: getProductos
       responses:
         '200':
-          description: ''
-      security:
-      - {}
-  /productos/Arise:
+          description: Lista de discos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Discos Disponibles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nombre:
+                          type: string
+                          example: Arise
+                        precio:
+                          type: number
+                          example: 2000
+                        imagen:
+                          type: string
+                          example: arise.jpg
+
+  /productos/{nombre}:
     get:
-      summary: Ver info de producto
-      description: 'Consulto la informacion de un solo producto '
-      operationId: verInfoDeProducto
-      requestBody:
-        content:
-          text/plain:
-            examples:
-              Ver info de producto:
-                value: ''
+      summary: Ver producto por nombre
+      description: Devuelve la información de un disco específico
+      operationId: getProducto
+      parameters:
+        - name: nombre
+          in: path
+          required: true
+          schema:
+            type: string
+          example: Arise
       responses:
         '200':
-          description: ''
-      security:
-      - {}
+          description: Datos del disco encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  disco:
+                    type: object
+                    properties:
+                      nombre:
+                        type: string
+                      precio:
+                        type: number
+                      imagen:
+                        type: string
+        '404':
+          description: Producto no encontrado
+
   /carrito:
     get:
-      summary: Carrito
-      description: Muestra el carrito vacio o los productos agregados
-      operationId: carrito
+      summary: Ver carrito
+      description: Muestra los productos actualmente en el carrito de la sesión
+      operationId: verCarrito
       responses:
         '200':
-          description: ''
-      security:
-      - {}
+          description: Contenido del carrito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    nombre:
+                      type: string
+                    precio:
+                      type: number
+                    cantidad:
+                      type: integer
+
+  /carrito/agregar:
     post:
-      summary: Agrego discos al carrito
-      description: Agrega el nombre del disco y la cantidad
-      operationId: agregoDiscosAlCarrito
+      summary: Agregar disco al carrito
+      description: Agrega un disco al carrito por nombre. Si ya existe, incrementa la cantidad.
+      operationId: agregarAlCarrito
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - nombre
               properties:
-                cantidad:
-                  type: number
-                  example: 2
                 nombre:
                   type: string
-                  example: Yes
-            examples:
-              Agrego discos al carrito:
-                value:
-                  cantidad: 2
-                  nombre: Yes
+                  example: Arise
+                cantidad:
+                  type: integer
+                  example: 1
       responses:
         '200':
-          description: ''
-      security:
-      - {}
-  /carrito/Yes:
+          description: Producto agregado correctamente
+        '400':
+          description: Falta el nombre del producto
+        '404':
+          description: Producto no encontrado
+
+  /carrito/{nombre}:
     delete:
-      summary: Eliminar disco
-      description: Elimino todos los discos con el nombre solicitado
-      operationId: eliminarDisco
-      requestBody:
-        content:
-          application/json:
-            examples:
-              Eliminar disco:
-                value: ''
+      summary: Eliminar disco del carrito
+      description: Elimina un disco del carrito por nombre
+      operationId: eliminarDelCarrito
+      parameters:
+        - name: nombre
+          in: path
+          required: true
+          schema:
+            type: string
+          example: Arise
       responses:
         '200':
-          description: ''
-      security:
-      - {}
+          description: Producto eliminado correctamente
+        '404':
+          description: Carrito vacío o producto no encontrado
+
   /carrito/total:
     get:
-      summary: Total de compra
-      description: Muestra el total de la compra
-      operationId: totalDeCompra
-      requestBody:
-        content:
-          application/json:
-            examples:
-              Total de compra:
-                value: ''
+      summary: Total de la compra
+      description: Calcula y devuelve el total acumulado del carrito
+      operationId: totalCarrito
       responses:
         '200':
-          description: ''
-      security:
-      - {}
-components:
-  securitySchemes: {}
-tags: []
+          description: Total calculado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Total de Compra:
+                    type: number
+                    example: 3000
 
-
+  /limpiar:
+    post:
+      summary: Vaciar carrito / limpiar sesión
+      description: Limpia la sesión del usuario y vacía el carrito
+      operationId: limpiarSesion
+      responses:
+        '200':
+          description: Sesión reiniciada correctamente
