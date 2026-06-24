@@ -8,20 +8,57 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
 
-        .contenedor { display: flex; gap: 40px; }   /*catalogo y carrito*/
+        .contenedor { display: flex; gap: 40px; }   /* Catálogo y Carrito */
 
         .seccion { background: white; padding: 20px; border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 50%; } /*estilo de cada una de las cajas*/
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 50%; } 
 
-        .producto, .item-carrito { display: flex; justify-content: space-between; 
-            align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        /* ordeno atrejtas una al lado de otra */
+        #lista-productos { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+
+        /* tarejta vertical praa discos*/
+        .producto { 
+            display: flex; 
+            flex-direction: column; /* apila verticalmente */
+            align-items: center; 
+            justify-content: space-between; 
+            background: #fafafa; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 6px; 
+            padding: 15px; 
+            width: 130px; 
+            text-align: center; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* postada de disco*/
+        .img-disco {
+            width: 110px;
+            height: 110px;
+            border-radius: 4px; 
+            margin-bottom: 8px;
+            object-fit: cover; 
+        }
+
+        // carrito estilo horizontal 
+        .item-carrito { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #eee; 
+        }
 
         button { background: #66ad76; color: white; border: none; padding: 6px 12px; 
-            border-radius: 4px; cursor: pointer; } /*boton agregar*/
+            border-radius: 4px; cursor: pointer; } /* boton agregar */
 
-        button.btn-eliminar { background: #dd757f; } /*boton X*/
+        button.btn-eliminar { background: #dd757f; } /* boton X */
 
-        button:hover { opacity: 0.9; } /*se activa al pasar el mouse */
+        button:hover { opacity: 0.9; } /* se activa al pasar el mouse */
 
         .grupo-botones { display: flex; gap: 10px; margin-top: 15px; }
 
@@ -55,7 +92,7 @@
                 <h2>¡Compra Confirmada!</h2>
                 <div id="detalle-ticket"></div>
                 <div class="grupo-botones">
-                    <button onclick="volverALaTienda()" style="background: #91b412;">Volver a comprar</button>
+                    <button onclick="volverATienda()" style="background: #91b412;">Volver a comprar</button>
                 </div>
             </div>
 
@@ -66,15 +103,18 @@
         // cargo productos desde app
         async function cargarProductos() {
             try {
-                const respuesta = await fetch('/productos'); // get a productos
+                const respuesta = await fetch('/productos'); // GET a productos
                 const datos = await respuesta.json(); 
                 const contenedor = document.getElementById('lista-productos'); 
                 contenedor.innerHTML = '';
 
                 datos["Discos Disponibles"].forEach(p => {
+                    // CAMBIO EN LA INYECCIÓN: Estructuramos de forma vertical e incluimos la etiqueta <img> dinámica
                     contenedor.innerHTML += `
                         <div class="producto">
-                            <span><strong>${p.nombre}</strong> - $${p.precio}</span>
+                            <img class="img-disco" src="https://placehold.co/150x150/2c3e50/ffffff?text=${p.nombre}" alt="${p.nombre}">
+                            <span style="margin-bottom: 4px;"><strong>${p.nombre}</strong></span>
+                            <span style="margin-bottom: 10px; color: #555;">$${p.precio}</span>
                             <button onclick="agregarAlCarrito('${p.nombre}')">Agregar</button>
                         </div>
                     `;
@@ -84,14 +124,14 @@
             }
         }
 
-        // agrego un producto usando post 
+        // agrego un producto usando POST 
         async function agregarAlCarrito(nombreProducto) {
             try {
                 const respuesta = await fetch('/carrito/agregar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nombre: nombreProducto, cantidad: 1 })
-                }); // envia el nombre y cantidad como json 
+                }); 
                 
                 if (respuesta.ok) {
                     actualizarCarrito();
@@ -101,7 +141,7 @@
             }
         }
 
-        // elimino algun proucto con delete
+        // Elimino algún producto con DELETE
         async function eliminarDelCarrito(nombreProducto) {
             try {
                 const respuesta = await fetch(`/carrito/${nombreProducto}`, {
@@ -115,7 +155,7 @@
             }
         }
 
-        //  Actualizar carrito y total
+        // actualiza carrito y total
         async function actualizarCarrito() {
             try {
                 const resCarrito = await fetch('/carrito');
@@ -125,12 +165,10 @@
                 const btnFinalizar = document.getElementById('btn-finalizar');
                 contenedor.innerHTML = '';
 
-                // si el carrito esta avcio no muestro finalizar compra
                 if (datosCarrito.length === 0) {
                     contenedor.innerHTML = 'El carrito está vacío.';
                     btnFinalizar.style.display = 'none';
                 } else {
-                    // si hay preductos muestro  finalizar compra
                     btnFinalizar.style.display = 'block';
                     datosCarrito.forEach(item => {
                         contenedor.innerHTML += `
@@ -142,7 +180,6 @@
                     });
                 }
 
-                //veo el total 
                 const resTotal = await fetch('/carrito/total');
                 const datosTotal = await resTotal.json();
                 document.getElementById('total-compra').textContent = datosTotal["Total de Compra"];
@@ -152,10 +189,9 @@
             }
         }
 
-        // trasnformo el carrito en ticket 
+        // carrito a ticket
         async function finalizarCompra() {
             try {
-                // guardo los datos del carrito para armar el ticket
                 const resCarrito = await fetch('/carrito');
                 const datosCarrito = await resCarrito.json();
                 
@@ -165,7 +201,6 @@
                 
                 const contenedorTicket = document.getElementById('detalle-ticket');
                 
-                // armo diseño ctotal compra y productos
                 let htmlTicket = `<h3>Tu compra: $${total}</h3>`;
                 htmlTicket += `<p><strong>Detalle de los productos:</strong></p><ul>`;
                 
@@ -174,37 +209,34 @@
                 });
                 htmlTicket += `</ul>`;
                 
-                // guardo resumen en el contenedro del ticket
                 contenedorTicket.innerHTML = htmlTicket;
                 
-                // guardo el carrito y muestro final de compra 
                 document.getElementById('carrito-activo').style.display = 'none';
                 document.getElementById('carrito-finalizado').style.display = 'block';
                 
-                // limpio la compra para volver a empezar
                 await fetch('/limpiar', { method: 'POST' });
- 
+
             } catch (error) {
                 console.error("Error al procesar la finalización de compra:", error);
             }
         }
 
-        // guardo el ticket para volver a comprar 
+        
         function volverATienda() {
             document.getElementById('carrito-finalizado').style.display = 'none';
             document.getElementById('carrito-activo').style.display = 'block';
             actualizarCarrito(); 
-        }
+        } // esconde el ticket y vuelve al carrito
 
-        // limpio manualmente 
+        
         async function limpiarSesion() {
             await fetch('/limpiar', { method: 'POST' });
             actualizarCarrito();
-        }
+        } // limpio manualmente  
 
-        // vuelve a cargar las funciones 
+        
         window.onload = function() {
-            cargarProductos(); /* al cargar la pestaña se ejecutan las funciones*/
+            cargarProductos(); // carga las funciones iniciales
             actualizarCarrito();
         };
     </script>
