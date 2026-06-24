@@ -41,7 +41,7 @@ def get_producto(nombre):
     conexion.close()
     
     if fila:
-        return jsonify({"disco": {"nombre": fila["nombre"], "precio": fila["precio"]}})
+        return jsonify({"disco": {"nombre": fila["nombre"], "precio": fila["precio"], "imagen": fila["imagen"]}})
     else:
         return jsonify("Producto no encontrado"), 404
 
@@ -66,7 +66,7 @@ def agregar_carrito():
         
     conexion = conectar_db()
     cursor = conexion.cursor()
-    cursor.execute('SELECT nombre, precio FROM productos WHERE LOWER(nombre) = LOWER(?)', (nombre,))
+    cursor.execute('SELECT nombre, precio, imagen FROM productos WHERE LOWER(nombre) = LOWER(?)', (nombre,))
     fila = cursor.fetchone()
     conexion.close()
     
@@ -82,12 +82,13 @@ def agregar_carrito():
         carrito.append({
             "nombre": fila['nombre'],
             "precio": fila['precio'],
+            "imagen": fila['imagen'], 
             "cantidad": cantidad
         })
         
     session['carrito'] = carrito
     session.modified = True
-    return jsonify(f"Producto {nombre} agregado correctamente al carrito"),200
+    return jsonify(f"Producto {nombre} agregado correctamente al carrito"), 200
     
 @app.route('/carrito/<string:nombre>', methods=['DELETE'])
 def eliminar_carrito(nombre):

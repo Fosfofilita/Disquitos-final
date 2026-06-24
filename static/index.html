@@ -101,18 +101,19 @@
 
     <script>
         // cargo productos desde app
+        // Cargo productos desde app
         async function cargarProductos() {
             try {
-                const respuesta = await fetch('/productos'); // GET a productos
+                const respuesta = await fetch('/productos'); 
                 const datos = await respuesta.json(); 
                 const contenedor = document.getElementById('lista-productos'); 
                 contenedor.innerHTML = '';
 
                 datos["Discos Disponibles"].forEach(p => {
-                    // CAMBIO EN LA INYECCIÓN: Estructuramos de forma vertical e incluimos la etiqueta <img> dinámica
+                    // CAMBIO AQUÍ: Ahora el src apunta a /imagenes/ y concatena el nombre del archivo real (p.imagen)
                     contenedor.innerHTML += `
                         <div class="producto">
-                            <img class="img-disco" src="https://placehold.co/150x150/2c3e50/ffffff?text=${p.nombre}" alt="${p.nombre}">
+                            <img class="img-disco" src="/imagenes/${p.imagen}" alt="${p.nombre}">
                             <span style="margin-bottom: 4px;"><strong>${p.nombre}</strong></span>
                             <span style="margin-bottom: 10px; color: #555;">$${p.precio}</span>
                             <button onclick="agregarAlCarrito('${p.nombre}')">Agregar</button>
@@ -123,7 +124,6 @@
                 console.error("Error al cargar productos:", error);
             }
         }
-
         // agrego un producto usando POST 
         async function agregarAlCarrito(nombreProducto) {
             try {
