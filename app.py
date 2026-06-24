@@ -25,18 +25,18 @@ def conectar_db():
 def get_productos():
     conexion = conectar_db()
     cursor = conexion.cursor()
-    cursor.execute('SELECT nombre, precio FROM productos')
+    cursor.execute('SELECT nombre, precio, imagen FROM productos')
     filas = cursor.fetchall()
     conexion.close()
     
-    lista_productos = [{"nombre": f["nombre"], "precio": f["precio"]} for f in filas]
+    lista_productos = [{"nombre": f["nombre"], "precio": f["precio"], "imagen": f["imagen"]} for f in filas]
     return jsonify({"Discos Disponibles": lista_productos})
 
 @app.route('/productos/<string:nombre>')
 def get_producto(nombre):
     conexion = conectar_db()
     cursor = conexion.cursor()
-    cursor.execute('SELECT nombre, precio FROM productos WHERE LOWER(nombre) = LOWER(?)', (nombre,))
+    cursor.execute('SELECT nombre, precio, imagen FROM productos WHERE LOWER(nombre) = LOWER(?)', (nombre,))
     fila = cursor.fetchone()
     conexion.close()
     
