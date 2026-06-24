@@ -2,29 +2,30 @@ import sqlite3
 
 def inicializar_base_de_datos():
     conexion = sqlite3.connect('disquitos.db')
-    cursor = conexion.cursor() # cursor indica posicion y permite ejecutar comandos 
+    cursor = conexion.cursor() 
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS productos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
-            precio REAL NOT NULL
+            precio REAL NOT NULL,
+            imagen TEXT
         )
     ''')
     
     cursor.execute('SELECT COUNT(*) FROM productos')
     if cursor.fetchone()[0] == 0: 
         discos_iniciales = [
-            ("Gulp", 1000),
-            ("Paranoid", 5000),
-            ("Arise", 2000),
-            ("Yes", 1000)
+            ("Gulp", 1000, "gulp.jpg"),
+            ("Paranoid", 5000, "paranoid.jpg"),
+            ("Arise", 2000, "arise.jpg"),
+            ("toxicity", 1000, "toxicity.jpg")
         ]
-        cursor.executemany('INSERT INTO productos (nombre, precio) VALUES (?, ?)', discos_iniciales) # remplaza los insert 
-        conexion.commit() # guardo de manera permanente 
-        print("Base de datos creada y stock inicial cargado correctamente")
+        cursor.executemany('INSERT INTO productos (nombre, precio, imagen) VALUES (?, ?, ?)', discos_iniciales) 
+        conexion.commit() 
+        print("Base de datos creada y stock con imágenes cargado correctamente")
     else:
-        print("La base de datos ya existe y tiene productos cargados.")
+        print("La base de datos ya existe.")
         
     conexion.close()
 
