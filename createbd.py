@@ -19,7 +19,7 @@ def inicializar_base_de_datos():
             ("Gulp", 1000, "gulp.jpg"),
             ("Paranoid", 5000, "paranoid.jpg"),
             ("Arise", 2000, "arise.jpg"),
-            ("toxicity", 1000, "toxicity.jpg")
+            ("Toxicity", 1000, "toxicity.jpg")
         ]
         cursor.executemany('INSERT INTO productos (nombre, precio, imagen) VALUES (?, ?, ?)', discos_iniciales) 
         conexion.commit() 
