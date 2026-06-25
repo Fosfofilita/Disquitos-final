@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request, session
 from flasgger import Swagger
-from productos import producto
 import sqlite3
 
 app = Flask(__name__, static_folder='static', static_url_path='')
