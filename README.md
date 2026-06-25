@@ -14,5 +14,12 @@ La interfaz visual utiliza **HTML5** para definir la estructura de los contenedo
 ### Tecnologías del Backend y Base de Datos
 La lógica de control del servidor está escrita en **Python**. El servidor web utiliza el microframework **Flask** para estructurar las rutas de la API que comunican los datos con el cliente. Para el almacenamiento permanente se usa **SQLite**, una base de datos relacional embebida que guarda el inventario en un archivo local. En el entorno de producción en la nube se emplea **Gunicorn** como servidor WSGI para gestionar de forma eficiente múltiples solicitudes simultáneas de usuarios.
 
-### Documentación y Calidad (QA)
+### Documentacion y Calidad (QA)
 Las rutas de comunicación están documentadas mediante **Flasgger & Swagger**, lo que permite mapear y probar los endpoints directamente desde el navegador. Las pruebas automáticas de código se estructuran con el framework **Pytest** para ejecutar verificaciones independientes. La simulación de usuario de extremo a extremo se realiza con **Selenium WebDriver**, un robot que abre el navegador y realiza los clics de compra para validar los totales. Estas pruebas emplean **Fixtures de Pytest** junto con la instrucción **yield** para controlar la apertura y el cierre seguro del navegador en cada ejecución.
+
+**Complicacion 1:** Preparacion del Frontend con tarejtas dinamicas 
+Al cambiar el diseño de la interfaz de una lista a tarjetas con su respectiva portada los elemntos se desalineaban de la pantalla y los titulos largos desconfiguraban el tamaño de los bloques , para solucionarlo separe las estructuras y aplique caracteristicas esteticas como flexbox y column los elementos se ordenaron de forma vertical y se distribuyeron uno al lado del otro solucionado el problema de estetica visual.
+**Complicacion 2:** Incorporacion de la tarejta al backend
+cuando realice la carga de las portadas en el servidor la pantalla mostraba errores de carga o los productos no aparecian porque las rutas de la consulta a la base de datos no incluian el arhivo imagen.Para resolverlo, modifique el codigo de python para que la ruta productos incluya la columna de la imagen en su select y en el frontend se uso fetch api y async wait para recibir las instrucciones json y devolver los archivos de imagen correspondientes.  
+**Complicacion 3:**
+
