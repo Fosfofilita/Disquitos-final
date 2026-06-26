@@ -21,7 +21,7 @@ Al cambiar el diseño de la interfaz de una lista a tarjetas con su respectiva p
 **Complicacion 2:** Incorporacion de la tarejta al backend
 cuando realice la carga de las portadas en el servidor la pantalla mostraba errores de carga o los productos no aparecian porque las rutas de la consulta a la base de datos no incluian el arhivo imagen.Para resolverlo, modifique el codigo de python para que la ruta productos incluya la columna de la imagen en su select y en el frontend se uso fetch api y async wait para recibir las instrucciones json y devolver los archivos de imagen correspondientes.  
 
-**Complicacion 3:**Logica del carrito y vinculacion con base de datos 
+**Complicacion 3:** Logica del carrito y vinculacion con base de datos 
 al presionar el boton de agregar, el sistema tenia fallas en el sevidor en falta de sincronzar los datos o dupliacion de datos. Para solucionarlo actualice la funcion en app.py que verifica la base de datos antes de guardar un elemneto. De este modo si se pide un producto y este ya existe en el carrito aumenta su cantidad, sino lo añade por primera vez.
 
 
