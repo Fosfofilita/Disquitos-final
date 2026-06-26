@@ -5,13 +5,13 @@
 
 ---
 
-### Arquitectura del Sistema
+## Arquitectura del Sistema
 El sistema utiliza una arquitectura cliente-servidor dividida en tres partes para procesar la informacion de forma independiente. El frontend maneja la interfaz de usuario en una sola pagina sin recargar el navegador. El backend funciona como una api rest que procesa las solicitudes de la pantalla y envia las respuestas en formato json. Los datos se dividen en una base de datos para el catalogo fijo de productos y en la memoria de sesion del servidor para almacenar el carrito de cada usuario de forma aislada.
 
-### Frontend
+## Frontend
 La interfaz visual utiliza html5 para definir la estructura de los contenedores de la tienda. El diseño estetico y la distribucion del espacio se manejan con css , aplicando el sistema flexbox  para organizar los discos en una grilla de tarjetas verticales. El dinamismo del sitio se programo con javascript, utilizando la interfaz fetch api junto con async o await para comunicarse con el backend en segundo plano y actualizar los elementos de la pantalla en tiempo real.
 
-### Backend y Base de Datos
+## Backend y Base de Datos
 El servidor esta escrito en python . Utiliza el microframework flask para estructurar las rutas de la api que comunican los datos con el cliente. Para el almacenamiento permanente se usa sqlite*, una base de datos relacional que guarda el inventario en un archivo local.
 
 ## Complicaciones y Soluciones
