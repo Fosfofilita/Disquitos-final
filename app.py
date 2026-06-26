@@ -17,15 +17,15 @@ def inicio():
 
 def conectar_db():
     conexion = sqlite3.connect('disquitos.db')
-    conexion.row_factory = sqlite3.Row
+    conexion.row_factory = sqlite3.Row #trasnformo las categorias en columnas para poder acceder a por nombre
     return conexion
 
 @app.route('/productos')
 def get_productos():
     conexion = conectar_db()
     cursor = conexion.cursor()
-    cursor.execute('SELECT nombre, precio, imagen FROM productos')
-    filas = cursor.fetchall()
+    cursor.execute('SELECT nombre, precio, imagen FROM productos') 
+    filas = cursor.fetchall() #trae todas las filas/datos 
     conexion.close()
     
     lista_productos = [{"nombre": f["nombre"], "precio": f["precio"], "imagen": f["imagen"]} for f in filas]
@@ -36,7 +36,7 @@ def get_producto(nombre):
     conexion = conectar_db()
     cursor = conexion.cursor()
     cursor.execute('SELECT nombre, precio, imagen FROM productos WHERE LOWER(nombre) = LOWER(?)', (nombre,))
-    fila = cursor.fetchone()
+    fila = cursor.fetchone() #trae la consulta 
     conexion.close()
     
     if fila:

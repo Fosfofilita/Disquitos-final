@@ -1,7 +1,7 @@
-import time
-import pytest
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+import time # paraagregar los sleep
+import pytest  #uso fixture 
+from selenium import webdriver 
+from selenium.webdriver.common.by import By # busca por xpath, id, class
 
 @pytest.fixture
 def driver():
@@ -9,6 +9,9 @@ def driver():
     driver.implicitly_wait(5)
     yield driver
     driver.quit()
+# creo la funcion dirver para que se ejecute en cada test , primero prepara el navegador con el timepo de carga
+# hace la prueba y lo cierra, asi apra qcaa test.
+
 
 def test_flujo_compra_completo(driver):
     driver.get("http://127.0.0.1:5000/")
@@ -18,7 +21,7 @@ def test_flujo_compra_completo(driver):
     boton_vaciar.click()
     time.sleep(1)
     
-    primer_producto = driver.find_element(By.CLASS_NAME, "producto")
+    primer_producto = driver.find_element(By.CLASS_NAME, "producto") # agrega gulp porque es el primer producto en la lista
     boton_agregar = primer_producto.find_element(By.TAG_NAME, "button")
     
     print("Prueba 1: comprar 1 disco")
@@ -42,7 +45,7 @@ def test_compra_masiva_diez_discos(driver):
     
     print("Prueba 2: comprando 10 unidades de Arise (Búsqueda Dinámica)")
     
-    # El robot busca la tarjeta que contiene el texto "Arise" sin importar su posición
+    # busca en el contendedor que tenga un producto con el texto arise 
     tarjeta_arise = driver.find_element(By.XPATH, "//div[contains(@class, 'producto') and .//*[contains(text(), 'Arise')]]")
     boton_agregar_arise = tarjeta_arise.find_element(By.TAG_NAME, "button")
 
@@ -70,9 +73,9 @@ def test_finalizar_compra_y_emision_ticket(driver):
     
     print("Prueba 3: flujo de compra y reseteo de Tienda")
     
-    # agrego disco arise
-    tarjeta_arise = driver.find_element(By.XPATH, "//div[contains(@class, 'producto') and .//*[contains(text(), 'Arise')]]")
-    tarjeta_arise.find_element(By.TAG_NAME, "button").click()
+    # agrego disco paranoid
+    tarjeta_para = driver.find_element(By.XPATH, "//div[contains(@class, 'producto') and .//*[contains(text(), 'Paranoid')]]")
+    tarjeta_para.find_element(By.TAG_NAME, "button").click()
     time.sleep(1)
     
     # busca y finaliza compra 
@@ -87,8 +90,8 @@ def test_finalizar_compra_y_emision_ticket(driver):
     print(f"Texto detectado en el ticket final:\n{texto_ticket}")
     
     # valido que  el ticket muestre el total y mencione al producto
-    assert "Tu compra: $2000" in texto_ticket, "Error: El ticket no muestra el encabezado de precio correcto"
-    assert "Arise" in texto_ticket, "Error: El desglose del ticket no menciona el producto comprado"
+    assert "Tu compra: $5000" in texto_ticket, "Error: El ticket no muestra el precio correcto"
+    assert "Paranoid" in texto_ticket, "Error: El ticket no menciona el producto comprado"
     print("Visualizacion de ticket: OK")
     
     # verifico que la tienda vuelva a $0
@@ -104,4 +107,4 @@ def test_finalizar_compra_y_emision_ticket(driver):
     print("Prueba 3 exitosa")
 
 
-#pytest teste2e.py -v
+#pytest teste2e.py 
