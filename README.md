@@ -1,5 +1,5 @@
 
-# Disquitos - Tienda de Discos Online
+# Disquitos - Tienda de Discos 
 
 **Disquitos** es una aplicación web para la compra de discos de musica en línea. Sus funciones principales son mostrar un catalogo de albumes con portadas, gestionar un carrito de compras interactivo para agregar o eliminar productos, calcular el precio total en tiempo real y generar un ticket con el resumen final de la compra.
 

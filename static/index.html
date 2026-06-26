@@ -100,8 +100,7 @@
     </div>
 
     <script>
-        // cargo productos desde app
-        // Cargo productos desde app
+        // cargo productos desde servidor
         async function cargarProductos() {
             try {
                 const respuesta = await fetch('/productos'); 
@@ -110,7 +109,6 @@
                 contenedor.innerHTML = '';
 
                 datos["Discos Disponibles"].forEach(p => {
-                    // CAMBIO AQUÍ: Ahora el src apunta a /imagenes/ y concatena el nombre del archivo real (p.imagen)
                     contenedor.innerHTML += `
                         <div class="producto">
                             <img class="img-disco" src="/imagenes/${p.imagen}" alt="${p.nombre}">
@@ -124,7 +122,7 @@
                 console.error("Error al cargar productos:", error);
             }
         }
-        // agrego un producto usando POST 
+
         async function agregarAlCarrito(nombreProducto) {
             try {
                 const respuesta = await fetch('/carrito/agregar', {
@@ -141,7 +139,6 @@
             }
         }
 
-        // Elimino algún producto con DELETE
         async function eliminarDelCarrito(nombreProducto) {
             try {
                 const respuesta = await fetch(`/carrito/${nombreProducto}`, {
@@ -155,7 +152,6 @@
             }
         }
 
-        // actualiza carrito y total
         async function actualizarCarrito() {
             try {
                 const resCarrito = await fetch('/carrito');
@@ -189,7 +185,7 @@
             }
         }
 
-        // carrito a ticket
+       
         async function finalizarCompra() {
             try {
                 const resCarrito = await fetch('/carrito');
